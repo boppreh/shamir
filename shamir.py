@@ -64,8 +64,8 @@ def get_threshold(points):
 
 if __name__ == '__main__':
 	secret = 42
-	n_parts = 1000
-	threshold = 1000
+	n_parts = 200
+	threshold = 200
 
 	print 'Splitting secret {} in {} parts with threshold {}.'.format(secret, n_parts, threshold)
 
@@ -73,6 +73,7 @@ if __name__ == '__main__':
 	print 'Shares:', shares
 	#print 'Detected threshold:', get_threshold(shares)
 
-	#import cProfile
-	#cProfile.run('join(shares[:threshold])')
+	import cProfile
+	#cProfile.run('join(shares[:threshold])', sort=1)
+	cProfile.run('reconstruct_poly(shares[:threshold])', sort=1)
 	#print 'Reconstructed secret:', join(shares[:threshold])
