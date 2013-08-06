@@ -60,20 +60,50 @@ def get_threshold(points):
 	"""
 	Returns the degree of the polynomial of a list of points.
 	"""
-	return reconstruct_poly(points).degree
+	# Not enough points.
+	if get_last_coefficient(points) != 0:
+		return None
+
+	# Starts trying with all points, assuming the threshold
+	# is nearer len(points) than 0.
+	for i in range(len(points), 1, -1):
+		if get_last_coefficient(points[:i]) != 0:
+			return i
+
+	return None
+
+def get_last_coefficient(points):
+	"""
+	Computes the last coefficient of the Lagrange Polynomial over the given
+	points.
+	"""
+	total = 0
+	for x1, y1 in points:
+		partial = 1
+		for x2, y2 in points:
+			if x1 != x2:
+				partial *= (x1 - x2)
+				
+		total += y1 / partial
+	
+	return total
 
 if __name__ == '__main__':
 	secret = 42
-	n_parts = 200
-	threshold = 200
+	n_parts = 700
+	threshold = 699
 
 	print 'Splitting secret {} in {} parts with threshold {}.'.format(secret, n_parts, threshold)
 
 	shares = split(secret, n_parts, threshold)
-	print 'Shares:', shares
+	#print 'Shares:', shares
+	#shares = [(1, 1494), (2, 1942), (3, 2578), (4, 3402), (5, 4414)]
+	#shares = [shares[1], shares[3], shares[4]]
+	#print 'Reconstructed poly:', reconstruct_poly(shares)
 	#print 'Detected threshold:', get_threshold(shares)
 
 	import cProfile
 	#cProfile.run('join(shares[:threshold])', sort=1)
-	cProfile.run('reconstruct_poly(shares[:threshold])', sort=1)
+	cProfile.run('get_threshold(shares[:n_parts])', sort=1)
+	#cProfile.run('reconstruct_poly(shares[:threshold])', sort=1)
 	#print 'Reconstructed secret:', join(shares[:threshold])
