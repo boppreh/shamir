@@ -1,38 +1,45 @@
-class FieldValue(long):
+try:
+    from itertools import izip_longest as zip_longest
+    base_value = long
+except:
+    from itertools import zip_longest
+    base_value = int
+
+class FieldValue(base_value):
     """
     Class for operating on finite fields with overloaded operators.
-    The field modulus e replicated on each field value.
+    The field modulus is replicated on each field value.
     """
     def __new__(cls, value, mod):
-        return long.__new__(cls, long(value % mod))
+        return base_value.__new__(cls, base_value(value % mod))
 
     def __init__(self, value, mod):
         self.mod = mod
-        long.__init__(long(value))
+        base_value.__init__(base_value(value))
 
     def __add__(self, other):
-        return FieldValue(long.__add__(self, long(other)), self.mod)
+        return FieldValue(base_value.__add__(self, base_value(other)), self.mod)
 
     def __radd__(self, other):
-        return FieldValue(long.__add__(self, long(other)), self.mod)
+        return FieldValue(base_value.__add__(self, base_value(other)), self.mod)
 
     def __sub__(self, other):
-        result = long.__sub__(self, long(other))
+        result = base_value.__sub__(self, base_value(other))
         while result < 0:
             result += self.mod
         return FieldValue(result, self.mod)
 
     def __rsub__(self, other):
-        result = long.__sub__(long(other), self)
+        result = base_value.__sub__(base_value(other), self)
         while result < 0:
             result += self.mod
         return FieldValue(result, self.mod)
 
     def __mul__(self, other):
-        return FieldValue(long(self) * long(other % self.mod), self.mod)
+        return FieldValue(base_value(self) * base_value(other % self.mod), self.mod)
 
     def __rmul__(self, other):
-        return FieldValue(long(other % self.mod) * long(self), self.mod)
+        return FieldValue(base_value(other % self.mod) * base_value(self), self.mod)
 
     def __div__(self, other):
         return self * FieldValue(other, self.mod).inverse()
@@ -41,10 +48,10 @@ class FieldValue(long):
         return other * self.inverse()
 
     def __pow__(self, other):
-        return FieldValue(pow(long(self), long(other), self.mod), self.mod)
+        return FieldValue(pow(base_value(self), base_value(other), self.mod), self.mod)
 
     def __eq__(self, other):
-        return long(self) == long(other) % self.mod
+        return base_value(self) == base_value(other) % self.mod
 
     def inverse(self):
         """
@@ -69,7 +76,6 @@ class FieldValue(long):
         return '{}(%{})'.format(int(self), self.mod)
 
 
-from itertools import izip_longest
 class Polynomial(object):
     """
     Class for handling polynomials with overloaded operators.
@@ -145,9 +151,9 @@ class Polynomial(object):
         Wraps the value in a polynomial with same degree.
         """
         if isinstance(value, Polynomial):
-            return izip_longest(self.coefs, value.coefs, fillvalue=0)
+            return zip_longest(self.coefs, value.coefs, fillvalue=0)
         else:
-            return izip_longest(self.coefs, [value], fillvalue=0)
+            return zip_longest(self.coefs, [value], fillvalue=0)
 
 if __name__ == '__main__':
     two = FieldValue(2, 23)
