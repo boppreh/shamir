@@ -99,6 +99,15 @@ def change_points(points):
     for x, y in points:
         yield (x, poly(x) - y)
 
+def has_liars(points):
+	"""
+	Detects if one or more points are fake. The number of points must be N + 1
+	above the threshold, where N is the maximum number of fake points able to
+	be detected.
+	"""
+	return get_threshold(points) == get_threshold(points[1:])
+
+
 if __name__ == '__main__':
     secret = 42
     n_parts = 10
