@@ -1,4 +1,5 @@
 import random
+from itertools import combinations
 from field import FieldValue, Polynomial
 
 mod = 997
@@ -51,7 +52,6 @@ def reconstruct_poly(points):
             if x1 != x2:
                 top *= Polynomial([-x2, 1])
                 bottom *= (x1 - x2)
-                
         result_poly += Polynomial([y1]) * top / bottom
 
     return result_poly
@@ -62,7 +62,7 @@ def get_threshold(points):
     """
     # Not enough points.
     if get_last_coefficient(points) != 0:
-        return None
+        return len(points)
 
     # Starts trying with all points, assuming the threshold
     # is nearer len(points) than 0.
@@ -70,7 +70,7 @@ def get_threshold(points):
         if get_last_coefficient(points[:i]) != 0:
             return i
 
-    return None
+    return len(points)
 
 def get_last_coefficient(points):
     """
@@ -100,23 +100,31 @@ def change_points(points):
         yield (x, poly(x) - y)
 
 def has_liars(points):
-	"""
-	Detects if one or more points are fake. The number of points must be N + 1
-	above the threshold, where N is the maximum number of fake points able to
-	be detected.
-	"""
-	return get_threshold(points) == get_threshold(points[1:])
+    """
+    Detects if one or more points are fake. The number of points must be N + 1
+    above the threshold, where N is the maximum number of fake points able to
+    be detected.
+    """
+    return get_threshold(points) != get_threshold(points[1:])
 
+def get_liars(points, threshold):
+    """
+    Detects and returns a list of fake points from `points`, assuming that the
+    real points were created with the given threshold.
+    """
+    for n_honest in reversed(range(threshold + 1, len(points))):
+        for combination in combinations(points, n_honest):
+            if not has_liars(combination):
+                return [p for p in points if p not in combination]
+
+    return []
 
 if __name__ == '__main__':
     secret = 42
     n_parts = 10
     threshold = 5
 
-    points = split(secret, n_parts, threshold)
-    print(points, join(points))
-    new_points = []
-    for initial, diff in zip(points, change_points(points)):
-        assert initial[0] == diff[0]
-        new_points.append((initial[0], initial[1] + diff[1]))
-    print(new_points, join(new_points))
+    points = [(1, 88L), (2, 622L), (3, 115L), (4, 114L), (5, 257L), (6, 267L), (7, 949L), (8, 000L)]
+    points = [(FieldValue(x, mod), FieldValue(y, mod)) for x, y in points]
+    print(get_liars(points, 5))
+    
