@@ -1,3 +1,4 @@
+from __future__ import division
 try:
     from itertools import izip_longest as zip_longest
     base_value = long
@@ -9,6 +10,8 @@ class FieldValue(base_value):
     """
     Class for operating on finite fields with overloaded operators.
     The field modulus is replicated on each field value.
+
+    **MOD MUST BE PRIME FOR CORRECT DIVISION**
     """
     def __new__(cls, value, mod):
         return base_value.__new__(cls, base_value(value % mod))
@@ -46,6 +49,12 @@ class FieldValue(base_value):
 
     def __rdiv__(self, other):
         return other * self.inverse()
+
+    def __truediv__(self, other):
+        return self.__div__(other)
+
+    def __rtruediv__(self, other):
+        return self.__rdiv__(other)
 
     def __pow__(self, other):
         return FieldValue(pow(base_value(self), base_value(other), self.mod), self.mod)
