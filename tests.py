@@ -61,7 +61,8 @@ class TestField(unittest.TestCase):
 class TestShamir(unittest.TestCase):
     def setUp(self):
         self.secret = 42
-        self.shares = split(self.secret, 5, 3)
+        s = [(1, 519), (2, 158), (3, 953), (4, 910), (5, 29)]
+        self.shares = [(FieldValue(x, mod), FieldValue(y, mod)) for x, y in s]
 
     def test_basic(self):
         self.assertEqual(len(self.shares), 5)
@@ -91,16 +92,15 @@ class TestShamir(unittest.TestCase):
         self.assertEqual(get_threshold(self.shares), 3)
 
         for i in range(0, mod, 200):
-            shares = split(i, 10, 5)
-            self.assertEqual(get_threshold(shares), 5)
-            self.assertEqual(get_threshold(shares[:6]), 5)
-            self.assertEqual(get_threshold(shares[:5]), 5)
-            self.assertEqual(get_threshold(shares[:4]), 4)
+            self.assertEqual(get_threshold(self.shares), 3)
+            self.assertEqual(get_threshold(self.shares[:-1]), 3)
+            self.assertEqual(get_threshold(self.shares[:-2]), 3)
+            self.assertEqual(get_threshold(self.shares[:-3]), 2)
 
-            self.assertEqual(get_last_coefficient(shares), 0)
-            self.assertEqual(get_last_coefficient(shares[:6]), 0)
-            self.assertNotEqual(get_last_coefficient(shares[:5]), 0)
-            self.assertNotEqual(get_last_coefficient(shares[:4]), 0)
+            self.assertEqual(get_last_coefficient(self.shares), 0)
+            self.assertEqual(get_last_coefficient(self.shares[:-1]), 0)
+            self.assertNotEqual(get_last_coefficient(self.shares[:-2]), 0)
+            self.assertNotEqual(get_last_coefficient(self.shares[:-3]), 0)
 
     def test_has_liars(self):
         self.assertFalse(has_liars(self.shares))
