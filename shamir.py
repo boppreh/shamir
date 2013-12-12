@@ -60,10 +60,6 @@ def get_threshold(points):
     """
     Returns the degree of the polynomial of a list of points.
     """
-    # Not enough points.
-    if get_last_coefficient(points) != 0:
-        return len(points)
-
     # Starts trying with all points, assuming the threshold
     # is nearer len(points) than 0.
     for i in range(len(points), 1, -1):

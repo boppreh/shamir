@@ -116,6 +116,7 @@ class TestShamir(unittest.TestCase):
         fake2 = (7, 150)
         self.assertEqual(get_honest(self.shares + [fake1]), honest)
         self.assertEqual(get_honest(self.shares + [fake1, fake2]), honest)
+        self.assertEqual(get_honest([fake1] + self.shares + [fake2]), honest)
 
 
 if __name__ == '__main__':
