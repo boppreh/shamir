@@ -72,8 +72,11 @@ class FieldValue(base_value):
 
         return lastx, lasty
 
-    def __str__(self):
+    def __repr__(self):
         return '{}(%{})'.format(int(self), self.mod)
+
+    def __str__(self):
+        return repr(self)
 
 
 class Polynomial(object):
@@ -122,6 +125,9 @@ class Polynomial(object):
             raise NotImplemented('Division of Polynomial by Polynomial is not yet implemented.')
         return Polynomial(c1 / other for c1 in self.coefs)
 
+    def __truediv__(self, other):
+        return self.__div__(other)
+
     def __call__(self, x):
         """
         Evaluates the Polynomial at `x`.
@@ -134,11 +140,14 @@ class Polynomial(object):
 
         return total
 
-    def __str__(self):
+    def __repr__(self):
         """
         Prints the polynomial in the format 10x^0 + 5x^1 + 2x^2 + ...
         """
         return ' + '.join('{}x^{}'.format(coef, power) for power, coef in enumerate(self.coefs))
+
+    def __str__(self):
+        return repr(self)
 
     def __eq__(self, other):
         if isinstance(other, Polynomial):

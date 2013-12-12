@@ -124,7 +124,12 @@ if __name__ == '__main__':
     n_parts = 10
     threshold = 5
 
-    points = [(1, 88L), (2, 622L), (3, 115L), (4, 114L), (5, 257L), (6, 267L), (7, 949L), (8, 000L)]
+    #points = [(1, 88L), (2, 622L), (3, 115L), (4, 114L), (5, 257L), (6, 267L), (7, 949L), (8, 000L)]
+    #points = [(FieldValue(x, mod), FieldValue(y, mod)) for x, y in points]
+    #print(get_liars(points, 5))
+
+    points = [(1, 10), (2, 10), (3, 10), (4, 10)]
     points = [(FieldValue(x, mod), FieldValue(y, mod)) for x, y in points]
-    print(get_liars(points, 5))
+    print(Polynomial([1, 2, 3]))
+    print(join(points), reconstruct_poly(points))
     
