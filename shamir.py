@@ -105,7 +105,7 @@ def has_liars(points):
     above the threshold, where N is the maximum number of fake points able to
     be detected.
     """
-    return get_threshold(points) != get_threshold(points[1:])
+    return get_threshold(points) == len(points)
 
 def get_liars(points, threshold):
     """
