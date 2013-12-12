@@ -26,6 +26,7 @@ class TestField(unittest.TestCase):
     def test_polynomial(self):
         p = Polynomial([1, 2, 3])
         q = Polynomial([4, 5, 6])
+        self.assertEqual(p.degree, 3)
         self.assertEqual(p, [1, 2, 3])
         self.assertEqual(p + 1, [2, 2, 3])
         self.assertEqual(p * 2, [2, 4, 6])
@@ -33,6 +34,7 @@ class TestField(unittest.TestCase):
         self.assertEqual(p + q, [5, 7, 9])
         self.assertEqual(q - p, [3, 3, 3])
         self.assertEqual(p * q, [4, 13, 28, 27, 18])
+        self.assertEqual((p * q).degree, 5)
 
         self.assertEqual(p(0), 1)
         self.assertEqual(p(1), 6)
@@ -56,5 +58,67 @@ class TestField(unittest.TestCase):
         self.assertEqual(p(2), 17)
         self.assertEqual(p(1000), FieldValue(34, mod))
 
+class TestShamir(unittest.TestCase):
+    def setUp(self):
+        self.secret = 42
+        self.shares = split(self.secret, 5, 3)
+
+    def test_basic(self):
+        self.assertEqual(len(self.shares), 5)
+        self.assertTrue(all(len(point) == 2 for point in self.shares))
+        self.assertTrue(all(isinstance(point[1], FieldValue) for point in self.shares))
+
+        self.assertEqual(join(self.shares), self.secret)
+        self.assertEqual(join(self.shares[:4]), self.secret)
+        self.assertEqual(join(self.shares[:3]), self.secret)
+        self.assertNotEqual(join(self.shares[:2]), self.secret)
+        self.assertNotEqual(join(self.shares[:1]), self.secret)
+
+    def test_poly(self):
+        self.assertEqual(reconstruct_poly(self.shares)(0), self.secret)
+        self.assertEqual(reconstruct_poly(self.shares).degree, 3)
+        self.assertEqual(reconstruct_poly(self.shares[:4]).degree, 3)
+        self.assertEqual(reconstruct_poly(self.shares[:3]).degree, 3)
+
+    def test_change_points(self):
+        shares_delta = change_points(self.shares)
+        new_shares = [(i[0], i[1] + j[1]) for i, j in
+                      zip(self.shares, shares_delta)]
+
+        self.assertEqual(join(new_shares), self.secret)
+
+    def test_get_threshold(self):
+        self.assertEqual(get_threshold(self.shares), 3)
+
+        for i in range(0, mod, 200):
+            shares = split(i, 10, 5)
+            self.assertEqual(get_threshold(shares), 5)
+            self.assertEqual(get_threshold(shares[:6]), 5)
+            self.assertEqual(get_threshold(shares[:5]), 5)
+            self.assertEqual(get_threshold(shares[:4]), 4)
+
+            self.assertEqual(get_last_coefficient(shares), 0)
+            self.assertEqual(get_last_coefficient(shares[:6]), 0)
+            self.assertNotEqual(get_last_coefficient(shares[:5]), 0)
+            self.assertNotEqual(get_last_coefficient(shares[:4]), 0)
+
+    def test_has_liars(self):
+        self.assertFalse(has_liars(self.shares))
+        self.assertFalse(has_liars(self.shares[:4]))
+        self.assertTrue(has_liars(self.shares[:3]))
+        self.assertTrue(has_liars(self.shares + [(6, 10)]))
+        self.assertTrue(has_liars([(6, 10)] + self.shares))
+
+    def test_get_honest(self):
+        honest = set(self.shares)
+        self.assertEqual(get_honest(self.shares), honest)
+        fake1 = (6, 100)
+        fake2 = (7, 150)
+        self.assertEqual(get_honest(self.shares + [fake1]), honest)
+        self.assertEqual(get_honest(self.shares + [fake1, fake2]), honest)
+
+
 if __name__ == '__main__':
     unittest.main()
+
+

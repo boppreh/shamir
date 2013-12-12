@@ -107,29 +107,25 @@ def has_liars(points):
     """
     return get_threshold(points) == len(points)
 
-def get_liars(points, threshold):
+def get_honest(points):
     """
-    Detects and returns a list of fake points from `points`, assuming that the
-    real points were created with the given threshold.
+    Detects and returns a list of honest points from `points`.
     """
-    for n_honest in reversed(range(threshold + 1, len(points))):
+    honest = set()
+
+    for n_honest in range(0, len(points)):
         for combination in combinations(points, n_honest):
             if not has_liars(combination):
-                return [p for p in points if p not in combination]
+                honest.update(combination)
 
-    return []
+    return honest
 
 if __name__ == '__main__':
     secret = 42
     n_parts = 10
     threshold = 5
 
-    #points = [(1, 88L), (2, 622L), (3, 115L), (4, 114L), (5, 257L), (6, 267L), (7, 949L), (8, 000L)]
-    #points = [(FieldValue(x, mod), FieldValue(y, mod)) for x, y in points]
-    #print(get_liars(points, 5))
-
-    points = [(1, 10), (2, 10), (3, 10), (4, 10)]
+    points = [(1, 88), (2, 622), (3, 115), (4, 114), (5, 257), (6, 267), (8, 000), (9, 000)]
     points = [(FieldValue(x, mod), FieldValue(y, mod)) for x, y in points]
-    print(Polynomial([1, 2, 3]))
-    print(join(points), reconstruct_poly(points))
-    
+    print(join(points))
+    print(sorted(get_honest(points)))

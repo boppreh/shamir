@@ -87,6 +87,9 @@ class FieldValue(base_value):
     def __str__(self):
         return repr(self)
 
+    def __hash__(self):
+        return base_value(self)
+
 
 class Polynomial(object):
     """
