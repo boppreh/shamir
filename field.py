@@ -156,7 +156,8 @@ class Polynomial(object):
         """
         Prints the polynomial in the format 10x^0 + 5x^1 + 2x^2 + ...
         """
-        return ' + '.join('{}x^{}'.format(coef, power) for power, coef in enumerate(self.coefs))
+        return ' + '.join('{}x^{}'.format(coef, power) for power, coef in
+                reversed(list(enumerate(self.coefs))))
 
     def __str__(self):
         return repr(self)

@@ -116,12 +116,17 @@ def get_honest(points):
 
     return honest
 
-if __name__ == '__main__':
-    secret = 42
-    n_parts = 10
-    threshold = 5
 
-    points = [(1, 88), (2, 622), (3, 115), (4, 114), (5, 257), (6, 267), (8, 000), (9, 000)]
-    points = [(FieldValue(x, mod), FieldValue(y, mod)) for x, y in points]
-    print(join(points))
-    print(sorted(get_honest(points)))
+if __name__ == '__main__':
+    mod = 11
+    num = lambda i: FieldValue(i, mod)
+
+    points = [(num(-1), num(0)),
+              (num(0), num(1)),
+              (num(1), num(0))]
+
+    print(reconstruct_poly(points))
+
+    points.append((num(2), num(2)))
+
+    print(reconstruct_poly(points))
