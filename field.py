@@ -140,10 +140,7 @@ class Polynomial(object):
     def __truediv__(self, other):
         return self.__div__(other)
 
-    def __call__(self, x):
-        """
-        Evaluates the Polynomial at `x`.
-        """
+    def naive_evaluation(self, x):
         power = 1
         total = 0
         for coef in self.coefs:
@@ -151,6 +148,19 @@ class Polynomial(object):
             power *= x
 
         return total
+
+    def horner_evaluation(self, x):
+        result = self.coefs[-1]
+        for coef in reversed(self.coefs[:-1]):
+            result = coef + result * x
+
+        return result
+
+    def __call__(self, x):
+        """
+        Evaluates the Polynomial at `x`.
+        """
+        return self.horner_evaluation(x)
 
     def __repr__(self):
         """
