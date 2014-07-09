@@ -150,8 +150,8 @@ class Polynomial(object):
         return total
 
     def horner_evaluation(self, x):
-        result = self.coefs[-1]
-        for coef in reversed(self.coefs[:-1]):
+        result = 0
+        for coef in reversed(self.coefs):
             result = coef + result * x
 
         return result
