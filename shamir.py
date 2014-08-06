@@ -1,3 +1,4 @@
+from __future__ import division
 import random
 from itertools import combinations
 from field import FieldValue, Polynomial
@@ -116,17 +117,29 @@ def get_honest(points):
 
     return honest
 
+n_polys = 0
+n_collisions = 0
+
+def a(points):
+    for j in range(3, 9):
+        for combination in combinations(points, j):
+            threshold = get_threshold(combination)
+            if threshold != j:
+                rec_poly = reconstruct_poly(combination)
+                if rec_poly != poly:
+                    global n_collisions
+                    n_collisions += 1
+                    return
+
+
 
 if __name__ == '__main__':
-    mod = 11
-    num = lambda i: FieldValue(i, mod)
+    from random import randint
+    for i in range(1000):
+        coefs = [FieldValue(randint(1, mod), mod) for i in range(6)]
+        poly = Polynomial(coefs)
+        n_polys += 1
+        points = poly.points(*range(1, 9))
+        a(points)
 
-    points = [(num(-1), num(0)),
-              (num(0), num(1)),
-              (num(1), num(0))]
-
-    print(reconstruct_poly(points))
-
-    points.append((num(2), num(2)))
-
-    print(reconstruct_poly(points))
+    print(100 * n_collisions / n_polys, "%")
